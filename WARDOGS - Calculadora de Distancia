@@ -1,0 +1,28 @@
+#Autor Olotrom
+@echo off
+title WARDOGS - Calculadora de Distancia
+color 0A
+
+:inicio
+cls
+echo ==========================================
+echo       WARDOGS - CALCULADORA DE DISTANCIA
+echo ==========================================
+echo.
+echo Cole as coordenadas exatamente neste formato:
+echo   x93.41, y64.85
+echo.
+echo Nao e necessario usar aspas.
+echo.
+
+set "coord1="
+set "coord2="
+
+set /p "coord1=Sua coordenada: "
+set /p "coord2=Coordenada inimiga: "
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$a=$env:coord1; $b=$env:coord2; try { $m1=[regex]::Match($a,'x\s*(-?\d+(?:\.\d+)?)\s*,\s*y\s*(-?\d+(?:\.\d+)?)'); $m2=[regex]::Match($b,'x\s*(-?\d+(?:\.\d+)?)\s*,\s*y\s*(-?\d+(?:\.\d+)?)'); if(-not $m1.Success -or -not $m2.Success){throw 'Formato invalido'}; $x1=[double]::Parse($m1.Groups[1].Value,[Globalization.CultureInfo]::InvariantCulture); $y1=[double]::Parse($m1.Groups[2].Value,[Globalization.CultureInfo]::InvariantCulture); $x2=[double]::Parse($m2.Groups[1].Value,[Globalization.CultureInfo]::InvariantCulture); $y2=[double]::Parse($m2.Groups[2].Value,[Globalization.CultureInfo]::InvariantCulture); $dx=$x2-$x1; $dy=$y2-$y1; $d=[math]::Sqrt($dx*$dx+$dy*$dy); Write-Host ''; Write-Host '==========================================' -ForegroundColor Green; Write-Host (' DX = {0:N2}' -f $dx); Write-Host (' DY = {0:N2}' -f $dy); Write-Host (' DISTANCIA = {0:N2}' -f $d) -ForegroundColor Yellow; Write-Host '==========================================' -ForegroundColor Green } catch { Write-Host ''; Write-Host 'ERRO: use exatamente o formato x93.41, y64.85' -ForegroundColor Red; Write-Host '' }"
+
+echo.
+pause
+goto inicio
