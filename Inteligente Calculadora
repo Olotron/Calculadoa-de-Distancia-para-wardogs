@@ -1,0 +1,86 @@
+#Autor Olotrom
+
+#https://github.com/Olotron/Calculadoa-de-Distancia-para-wardogs/blob/586ff0ea13ab4a90a62771fdf149796e86984a8f/WARDOGS%20-%20Calculadora%20de%20Distancia
+
+@echo off
+title WARDOGS - Calculadora de Distancia para Artilharia
+color 0A
+
+:inicio
+cls
+echo ==========================================
+echo       WARDOGS - CALCULADORA DE DISTANCIA
+echo ==========================================
+echo.
+echo COPIE SUA COORDENADA NO MAPA DO WARDOGS
+echo.
+echo Formato aceito:
+echo   x93.41, y64.85
+echo.
+echo O programa detectara automaticamente.
+echo Nao e necessario colar ou pressionar Enter.
+echo.
+echo ==========================================
+echo.
+
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
+"$ErrorActionPreference='SilentlyContinue'; ^
+Add-Type -AssemblyName System.Windows.Forms; ^
+Write-Host 'Aguardando sua coordenada...' -ForegroundColor Cyan; ^
+$ultima=''; ^
+$estado='propria'; ^
+$x1=0; ^
+$y1=0; ^
+while($true) { ^
+    try { $clip=[System.Windows.Forms.Clipboard]::GetText() } catch { $clip='' }; ^
+    if($clip -ne $ultima) { ^
+        $ultima=$clip; ^
+        $texto=$clip.Trim(); ^
+        $m=[regex]::Match($texto,'^x(-?\d+\.\d+), y(-?\d+\.\d+)$'); ^
+        if($m.Success) { ^
+            $x=[double]::Parse($m.Groups[1].Value,[Globalization.CultureInfo]::InvariantCulture); ^
+            $y=[double]::Parse($m.Groups[2].Value,[Globalization.CultureInfo]::InvariantCulture); ^
+            if($estado -eq 'propria') { ^
+                $x1=$x; ^
+                $y1=$y; ^
+                Write-Host ''; ^
+                Write-Host '==========================================' -ForegroundColor Green; ^
+                Write-Host '        SUA COORDENADA RECEBIDA' -ForegroundColor Green; ^
+                Write-Host '==========================================' -ForegroundColor Green; ^
+                Write-Host (' POSICAO = x{0}, y{1}' -f $x.ToString('0.00'),$y.ToString('0.00')) -ForegroundColor White; ^
+                Write-Host ''; ^
+                Write-Host 'Agora copie a coordenada do INIMIGO.' -ForegroundColor Cyan; ^
+                Write-Host ''; ^
+                $estado='inimigo'; ^
+            } ^
+            else { ^
+                $x2=$x; ^
+                $y2=$y; ^
+                $dx=$x2-$x1; ^
+                $dy=$y2-$y1; ^
+                $d=[math]::Sqrt(($dx*$dx)+($dy*$dy)); ^
+                $metros=$d*100; ^
+                $km=$d/10; ^
+                Write-Host ''; ^
+                Write-Host '==========================================' -ForegroundColor Green; ^
+                Write-Host '           DISTANCIA CALCULADA' -ForegroundColor Green; ^
+                Write-Host '==========================================' -ForegroundColor Green; ^
+                Write-Host (' DX = {0:N2}' -f $dx); ^
+                Write-Host (' DY = {0:N2}' -f $dy); ^
+                Write-Host ''; ^
+                Write-Host (' DISTANCIA = {0:N2} unidades - MORTEIRO' -f $d) -ForegroundColor Yellow; ^
+                Write-Host ('            = {0:N0} metros - SPH-2 ARTILHARIA OBUSEIRA' -f $metros) -ForegroundColor Yellow; ^
+                Write-Host ('            = {0:N3} km' -f $km) -ForegroundColor Yellow; ^
+                Write-Host '==========================================' -ForegroundColor Green; ^
+                Write-Host ''; ^
+                Write-Host 'Voltando ao inicio...' -ForegroundColor Cyan; ^
+                Start-Sleep -Milliseconds 800; ^
+                Write-Host ''; ^
+                Write-Host 'Copie sua NOVA coordenada no mapa.' -ForegroundColor Cyan; ^
+                Write-Host ''; ^
+                $estado='propria'; ^
+            } ^
+        } ^
+    } ^
+    Start-Sleep -Milliseconds 150 ^
+}"
